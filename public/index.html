@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>University Search</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      margin-top: 20px;
+      text-align: center;
+      color: #343a40;
+    }
+    .container {
+      margin-top: 50px;
+    }
+    .table th, .table td {
+      vertical-align: middle;
+      text-align: center;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    .btn-secondary {
+      background-color: #6c757d;
+      border: none;
+    }
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Search for Universities</h1>
+    <form id="searchForm" class="text-center mb-4">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <input type="text" id="name" class="form-control" placeholder="University Name">
+        </div>
+        <div class="col-md-4">
+          <input type="text" id="country" class="form-control" placeholder="Country">
+        </div>
+        <div class="col-md-2">
+          <input type="number" id="limit" class="form-control" placeholder="Limit">
+        </div>
+        <div class="col-md-2">
+          <input type="number" id="offset" class="form-control" placeholder="Offset">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+        <div class="col-md-6">
+          <a href="favourites.html" class="btn btn-secondary">View Favourites</a>
+        </div>
+      </div>
+    </form>
+      
+    <table class="table mt-3 table-striped table-bordered" id="resultsTable">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>State/Province</th>
+          <th>Web Pages</th>
+          <th>Favourite</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    document.getElementById('searchForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const country = document.getElementById('country').value;
+      const limit = document.getElementById('limit').value;
+      const offset = document.getElementById('offset').value;
+
+      let apiUrl = `http://universities.hipolabs.com/search`;
+      let params = [];
+      if (name) params.push(`name=${encodeURIComponent(name)}`);
+      if (country) params.push(`country=${encodeURIComponent(country)}`);
+      if (limit) params.push(`limit=${encodeURIComponent(limit)}`);
+      if (offset) params.push(`offset=${encodeURIComponent(offset)}`);
+
+      if (params.length > 0) {
+        apiUrl += `?${params.join('&')}`;
+      }
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const tbody = document.querySelector('#resultsTable tbody');
+          tbody.innerHTML = '';
+          data.forEach(university => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${university.name}</td>
+              <td>${university['state-province'] || ''}</td>
+              <td><a href="${university.web_pages[0]}" target="_blank">Website</a></td>
+              <td><button class="btn btn-secondary btn-favourite">Favourite</button></td>
+            `;
+            row.querySelector('.btn-favourite').addEventListener('click', () => {
+              fetch('/api/favourites', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  name: university.name,
+                  state_province: university['state-province'] || '',
+                  web_pages: university.web_pages[0]
+                })
+              }).then(response => {
+                if (response.ok) {
+                  alert('Added to favourites');
+                }
+              });
+            });
+            tbody.appendChild(row);
+          });
+        });
+    });
+  </script>
+</body>
+</html>

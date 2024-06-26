@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favourite Universities</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      margin-top: 50px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #343a40;
+    }
+    .btn-back {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="btn btn-primary btn-back" onclick="goToIndex()">Back to Search</button>
+    <h1>Favourite Universities</h1>
+    <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>State/Province</th>
+          <th>Web Pages</th>
+        </tr>
+      </thead>
+      <tbody id="favouritesTableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    function goToIndex() {
+      window.location.href = 'index.html';
+    }
+
+    window.onload = function () {
+      fetch('/api/favourites')
+        .then(response => response.json())
+        .then(data => {
+          const tbody = document.getElementById('favouritesTableBody');
+          tbody.innerHTML = '';
+          data.forEach(university => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${university.name}</td>
+              <td>${university.state_province || ''}</td>
+              <td><a href="${university.web_pages}" target="_blank">Website</a></td>
+            `;
+            tbody.appendChild(row);
+          });
+        });
+    };
+  </script>
+</body>
+</html>
