@@ -21,5 +21,5 @@ This project is a web application to search for universities in India and save f
 1. Clone the repository:
 
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/rajdhanwar-suraj/slashash-test
    cd university-search
