@@ -2,8 +2,10 @@ const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 const db = mysql.createConnection({
